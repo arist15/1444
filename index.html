@@ -14,8 +14,8 @@
   }
 
   body {
-    font-family: "Songti SC", "Noto Serif SC", "SimSun", "宋体", serif;
-    background-color: #F9E6C8;
+    font-family: "Songti SC", "Noto Serif SC", "SimSun", "宋体", "FangSong", "仿宋", serif;
+    background-color: #F7EEE1;
     color: #4A3A2A;
     min-height: 100vh;
     display: flex;
@@ -25,19 +25,19 @@
     overflow-x: hidden;
   }
 
-  /* 页面容器 */
+  /* 页面容器 —— 尖角设计 */
   .app-container {
     width: 100%;
     max-width: 500px;
-    background: rgba(255, 250, 240, 0.75);
+    background: rgba(255, 250, 240, 0.8);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
-    border-radius: 32px;
-    box-shadow: 0 20px 60px rgba(140, 110, 70, 0.15), 0 8px 24px rgba(140, 110, 70, 0.08);
-    padding: 32px 24px 40px;
+    border-radius: 4px; /* 尖角风格：接近直角 */
+    box-shadow: 0 20px 60px rgba(140, 110, 70, 0.12), 0 8px 24px rgba(140, 110, 70, 0.06);
+    padding: 36px 26px 42px;
     position: relative;
     overflow: hidden;
-    border: 1px solid rgba(255, 240, 220, 0.9);
+    border: 1px solid rgba(255, 240, 220, 0.8);
   }
 
   /* 状态切换动画 */
@@ -57,7 +57,7 @@
   /* ===== 开始页 ===== */
   #startScreen {
     text-align: center;
-    padding: 40px 0;
+    padding: 48px 0 32px;
   }
 
   .start-title {
@@ -65,9 +65,27 @@
     font-weight: bold;
     color: #5C4A3A;
     letter-spacing: 2px;
-    line-height: 1.5;
-    margin-bottom: 48px;
+    line-height: 1.6;
+    margin-bottom: 20px;
     animation: fadeInUp 1.8s ease forwards;
+    opacity: 0;
+  }
+
+  .start-author {
+    font-size: 15px;
+    color: #9C8A78;
+    letter-spacing: 2px;
+    margin-bottom: 60px;
+    animation: fadeInUp 1.8s ease 0.3s forwards;
+    opacity: 0;
+  }
+
+  .start-note {
+    font-size: 13px;
+    color: #B8A898;
+    letter-spacing: 1px;
+    margin-bottom: 36px;
+    animation: fadeInUp 1.8s ease 0.5s forwards;
     opacity: 0;
   }
 
@@ -90,18 +108,18 @@
     color: #FFF8F0;
     background: linear-gradient(135deg, #C49A6C, #A87B4C);
     border: none;
-    border-radius: 50px;
+    border-radius: 4px; /* 尖角 */
     cursor: pointer;
-    box-shadow: 0 8px 24px rgba(168, 123, 76, 0.35);
+    box-shadow: 0 8px 24px rgba(168, 123, 76, 0.3);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
     letter-spacing: 4px;
     opacity: 0;
-    animation: fadeInUp 1.8s ease 0.6s forwards;
+    animation: fadeInUp 1.8s ease 0.8s forwards;
   }
 
   .start-btn:active {
     transform: scale(0.96);
-    box-shadow: 0 4px 12px rgba(168, 123, 76, 0.3);
+    box-shadow: 0 4px 12px rgba(168, 123, 76, 0.25);
   }
 
   /* ===== 答题页 ===== */
@@ -109,7 +127,6 @@
     padding: 8px 0;
   }
 
-  /* 顶部进度信息 */
   .quiz-header {
     display: flex;
     justify-content: space-between;
@@ -162,7 +179,7 @@
     color: #4A3A2A;
     background: rgba(255, 252, 245, 0.9);
     border: 1.5px solid rgba(200, 170, 140, 0.4);
-    border-radius: 16px;
+    border-radius: 4px; /* 尖角 */
     cursor: pointer;
     transition: all 0.25s ease;
     box-shadow: 0 2px 8px rgba(140, 110, 70, 0.04);
@@ -175,7 +192,6 @@
     box-shadow: 0 1px 4px rgba(140, 110, 70, 0.08);
   }
 
-  /* 选项按钮编号 */
   .option-prefix {
     display: inline-block;
     width: 24px;
@@ -208,16 +224,22 @@
   }
 
   .result-role {
-    font-size: 42px;
+    font-size: 40px;
     font-weight: bold;
     color: #5C4A3A;
     letter-spacing: 4px;
     margin-bottom: 20px;
-    line-height: 1.3;
+    line-height: 1.4;
     background: linear-gradient(135deg, #8B6B4A, #A87B4C);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .result-role.tie {
+    font-size: 26px;
+    line-height: 1.6;
+    letter-spacing: 2px;
   }
 
   .result-desc {
@@ -284,7 +306,7 @@
     color: #FFF8F0;
     background: linear-gradient(135deg, #C49A6C, #A87B4C);
     border: none;
-    border-radius: 50px;
+    border-radius: 4px; /* 尖角 */
     cursor: pointer;
     box-shadow: 0 8px 24px rgba(168, 123, 76, 0.3);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -316,14 +338,17 @@
   /* 小屏适配 */
   @media (max-width: 400px) {
     .app-container {
-      padding: 24px 16px 32px;
-      border-radius: 24px;
+      padding: 26px 16px 34px;
+      border-radius: 2px;
     }
     .start-title {
       font-size: 24px;
     }
     .result-role {
       font-size: 34px;
+    }
+    .result-role.tie {
+      font-size: 22px;
     }
     .question-text {
       font-size: 17px;
@@ -342,6 +367,8 @@
   <!-- ===== 开始页 ===== -->
   <div id="startScreen" class="state active">
     <div class="start-title">测测你像<br>艺术是死里的谁</div>
+    <div class="start-author">@目非</div>
+    <div class="start-note">仅供娱乐，请勿当真</div>
     <button class="start-btn" id="startBtn">开 始</button>
   </div>
 
@@ -428,12 +455,12 @@ const questions = [
     ]
   },
   {
-    text: "你有一个不为人知的秘密，它更接近哪一种？",
+    text: "假如你的房子着火了，你会？",
     options: [
-      { text: "你曾经做过一件无法挽回的事，至今仍在承受后果。", scores: { spring: 1 } },
-      { text: "你相信一些别人觉得疯狂的东西，并且已经在悄悄实践。", scores: { winter: 1 } },
-      { text: "你隐藏了真实身份，接近某个人是为了完成自己的目标。", scores: { autumn: 1 } },
-      { text: "你正在计划一件事，这件事会伤害一些人，但你认为值得。", scores: { wind: 1 } }
+      { text: "上吊", scores: { spring: 1 } },
+      { text: "拍照", scores: { winter: 1 } },
+      { text: "报警", scores: { autumn: 1 } },
+      { text: "救火", scores: { wind: 1 } }
     ]
   },
   {
@@ -580,7 +607,6 @@ const retryBtn = document.getElementById('retryBtn');
    ============================================================ */
 function switchState(fromEl, toEl) {
   fromEl.classList.remove('active');
-  // 短暂延迟后显示新页面，保证动画流畅
   setTimeout(() => {
     toEl.classList.add('active');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -638,10 +664,8 @@ function handleOptionClick(optionScores) {
     currentQuestionIndex++;
 
     if (currentQuestionIndex < totalQuestions) {
-      // 还有题目，继续答题
       renderQuestion();
     } else {
-      // 答完所有题目，显示结果
       showResult();
     }
   }, 350);
@@ -666,18 +690,19 @@ function showResult() {
 
   // 3. 生成结果角色名
   let roleNameText = '';
+  let isTie = false;
+
   if (topRoles.length === 1) {
-    // 无并列
     roleNameText = roleInfo[topRoles[0]].name;
   } else if (topRoles.length === 2) {
-    // 两项并列
-    roleNameText = `${roleInfo[topRoles[0]].name} 或 ${roleInfo[topRoles[1]].name}`;
+    isTie = true;
+    roleNameText = `你像${roleInfo[topRoles[0]].name}<br>或<br>${roleInfo[topRoles[1]].name}`;
   } else if (topRoles.length === 3) {
-    // 三项并列
-    roleNameText = `${roleInfo[topRoles[0]].name} 或 ${roleInfo[topRoles[1]].name} 或 ${roleInfo[topRoles[2]].name}`;
+    isTie = true;
+    roleNameText = `你像${roleInfo[topRoles[0]].name}<br>或<br>${roleInfo[topRoles[1]].name}<br>或<br>${roleInfo[topRoles[2]].name}`;
   } else {
-    // 四项全部并列（理论上极少出现）
-    roleNameText = `${roleInfo.spring.name} 或 ${roleInfo.winter.name} 或 ${roleInfo.autumn.name} 或 ${roleInfo.wind.name}`;
+    isTie = true;
+    roleNameText = `你像${roleInfo.spring.name}<br>或<br>${roleInfo.winter.name}<br>或<br>${roleInfo.autumn.name}<br>或<br>${roleInfo.wind.name}`;
   }
 
   // 4. 生成描述（如果是并列，取第一个角色的描述）
@@ -685,12 +710,16 @@ function showResult() {
   const descText = roleInfo[mainRole].desc;
 
   // 5. 更新结果页 DOM
-  resultRole.textContent = roleNameText;
+  if (isTie) {
+    resultRole.classList.add('tie');
+  } else {
+    resultRole.classList.remove('tie');
+  }
+  resultRole.innerHTML = roleNameText; // 使用 innerHTML 以支持换行
   resultDesc.textContent = descText;
 
   // 6. 生成百分比条
   percentSection.innerHTML = '';
-  // 按固定顺序展示，方便对比
   const order = ['spring', 'winter', 'autumn', 'wind'];
   order.forEach(key => {
     const item = document.createElement('div');
@@ -705,7 +734,6 @@ function showResult() {
 
     const fillEl = document.createElement('div');
     fillEl.className = 'percent-bar-fill';
-    // 初始宽度 0，下一帧再设置目标宽度以触发过渡动画
     fillEl.style.width = '0%';
 
     const valueEl = document.createElement('div');
@@ -718,7 +746,6 @@ function showResult() {
     item.appendChild(valueEl);
     percentSection.appendChild(item);
 
-    // 延迟设置宽度，触发 CSS 过渡
     setTimeout(() => {
       fillEl.style.width = `${percentages[key]}%`;
     }, 100);
@@ -737,16 +764,14 @@ function resetAll() {
   currentQuestionIndex = 0;
   scores = { spring: 0, winter: 0, autumn: 0, wind: 0 };
 
-  // 清空结果页展示内容
   resultRole.textContent = '';
+  resultRole.classList.remove('tie');
   resultDesc.textContent = '';
   percentSection.innerHTML = '';
 
-  // 进度条重置
   progressFill.style.width = '0%';
   percentText.textContent = '0%';
 
-  // 回到开始页
   switchState(resultScreen, startScreen);
 }
 
@@ -756,13 +781,11 @@ function resetAll() {
 
 // 开始按钮
 startBtn.addEventListener('click', () => {
-  // 重置状态后进入答题
   currentQuestionIndex = 0;
   scores = { spring: 0, winter: 0, autumn: 0, wind: 0 };
 
   switchState(startScreen, quizScreen);
 
-  // 稍等动画完成后渲染第一题
   setTimeout(() => {
     renderQuestion();
   }, 300);
@@ -773,9 +796,8 @@ retryBtn.addEventListener('click', () => {
   resetAll();
 });
 
-/* 初始化：确保开始页可见 */
+/* 初始化 */
 window.addEventListener('DOMContentLoaded', () => {
-  // 初始只显示开始页，隐藏其他
   startScreen.classList.add('active');
   quizScreen.classList.remove('active');
   resultScreen.classList.remove('active');
