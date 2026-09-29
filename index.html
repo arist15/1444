@@ -2,89 +2,785 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>我的测试</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>测测你像艺术是死里的谁</title>
 <style>
-  body { font-family: -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
-  .card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
-  h1 { font-size: 22px; text-align: center; }
-  .question { font-size: 18px; margin: 20px 0; }
-  .option { display: block; width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #e0e0e0; border-radius: 10px; background: #fff; font-size: 16px; text-align: left; }
-  .option:active { background: #eef; border-color: #66f; }
-  .result { font-size: 24px; font-weight: bold; text-align: center; color: #3366ff; }
-  .progress { height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden; margin-bottom: 20px; }
-  .progress-bar { height: 100%; background: #3366ff; width: 0; transition: width 0.3s; }
-  .hidden { display: none; }
+  /* ===== 全局样式 ===== */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    font-family: "Songti SC", "Noto Serif SC", "SimSun", "宋体", serif;
+    background-color: #F9E6C8;
+    color: #4A3A2A;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+  }
+
+  /* 页面容器 */
+  .app-container {
+    width: 100%;
+    max-width: 500px;
+    background: rgba(255, 250, 240, 0.75);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 32px;
+    box-shadow: 0 20px 60px rgba(140, 110, 70, 0.15), 0 8px 24px rgba(140, 110, 70, 0.08);
+    padding: 32px 24px 40px;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 240, 220, 0.9);
+  }
+
+  /* 状态切换动画 */
+  .state {
+    display: none;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .state.active {
+    display: block;
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===== 开始页 ===== */
+  #startScreen {
+    text-align: center;
+    padding: 40px 0;
+  }
+
+  .start-title {
+    font-size: 28px;
+    font-weight: bold;
+    color: #5C4A3A;
+    letter-spacing: 2px;
+    line-height: 1.5;
+    margin-bottom: 48px;
+    animation: fadeInUp 1.8s ease forwards;
+    opacity: 0;
+  }
+
+  @keyframes fadeInUp {
+    from {
+      opacity: 0;
+      transform: translateY(24px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .start-btn {
+    display: inline-block;
+    padding: 16px 64px;
+    font-size: 20px;
+    font-family: inherit;
+    color: #FFF8F0;
+    background: linear-gradient(135deg, #C49A6C, #A87B4C);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(168, 123, 76, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    letter-spacing: 4px;
+    opacity: 0;
+    animation: fadeInUp 1.8s ease 0.6s forwards;
+  }
+
+  .start-btn:active {
+    transform: scale(0.96);
+    box-shadow: 0 4px 12px rgba(168, 123, 76, 0.3);
+  }
+
+  /* ===== 答题页 ===== */
+  #quizScreen {
+    padding: 8px 0;
+  }
+
+  /* 顶部进度信息 */
+  .quiz-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: #8A7A6A;
+    letter-spacing: 1px;
+  }
+
+  .progress-track {
+    width: 100%;
+    height: 6px;
+    background: rgba(200, 180, 160, 0.25);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 28px;
+  }
+
+  .progress-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #C49A6C, #A87B4C);
+    border-radius: 3px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .question-text {
+    font-size: 19px;
+    line-height: 1.7;
+    color: #4A3A2A;
+    margin-bottom: 28px;
+    min-height: 80px;
+    letter-spacing: 0.5px;
+  }
+
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .option-btn {
+    width: 100%;
+    text-align: left;
+    padding: 16px 20px;
+    font-size: 16px;
+    font-family: inherit;
+    line-height: 1.5;
+    color: #4A3A2A;
+    background: rgba(255, 252, 245, 0.9);
+    border: 1.5px solid rgba(200, 170, 140, 0.4);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 2px 8px rgba(140, 110, 70, 0.04);
+  }
+
+  .option-btn:active {
+    background: rgba(240, 225, 200, 1);
+    border-color: #C49A6C;
+    transform: scale(0.98);
+    box-shadow: 0 1px 4px rgba(140, 110, 70, 0.08);
+  }
+
+  /* 选项按钮编号 */
+  .option-prefix {
+    display: inline-block;
+    width: 24px;
+    font-weight: bold;
+    color: #A87B4C;
+    margin-right: 4px;
+  }
+
+  /* 答题页切换动画 */
+  .quiz-fade {
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+
+  .quiz-fade.out {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+
+  /* ===== 结果页 ===== */
+  #resultScreen {
+    text-align: center;
+    padding: 16px 0 8px;
+  }
+
+  .result-label {
+    font-size: 14px;
+    color: #8A7A6A;
+    letter-spacing: 3px;
+    margin-bottom: 12px;
+  }
+
+  .result-role {
+    font-size: 42px;
+    font-weight: bold;
+    color: #5C4A3A;
+    letter-spacing: 4px;
+    margin-bottom: 20px;
+    line-height: 1.3;
+    background: linear-gradient(135deg, #8B6B4A, #A87B4C);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .result-desc {
+    font-size: 15px;
+    line-height: 1.9;
+    color: #6A5A4A;
+    text-align: justify;
+    margin-bottom: 28px;
+    padding: 0 4px;
+    letter-spacing: 0.3px;
+  }
+
+  .percent-section {
+    margin-bottom: 32px;
+  }
+
+  .percent-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 14px;
+    color: #6A5A4A;
+  }
+
+  .percent-name {
+    width: 80px;
+    text-align: right;
+    padding-right: 12px;
+    flex-shrink: 0;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+
+  .percent-bar-track {
+    flex: 1;
+    height: 10px;
+    background: rgba(200, 180, 160, 0.2);
+    border-radius: 5px;
+    overflow: hidden;
+    margin-right: 10px;
+  }
+
+  .percent-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #D4B896, #A87B4C);
+    border-radius: 5px;
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .percent-value {
+    width: 44px;
+    text-align: left;
+    font-size: 13px;
+    color: #8A7A6A;
+    flex-shrink: 0;
+  }
+
+  .retry-btn {
+    display: inline-block;
+    padding: 14px 48px;
+    font-size: 17px;
+    font-family: inherit;
+    color: #FFF8F0;
+    background: linear-gradient(135deg, #C49A6C, #A87B4C);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 8px 24px rgba(168, 123, 76, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    letter-spacing: 3px;
+  }
+
+  .retry-btn:active {
+    transform: scale(0.96);
+    box-shadow: 0 4px 12px rgba(168, 123, 76, 0.25);
+  }
+
+  /* 结果页内容渐入 */
+  .result-content {
+    opacity: 0;
+    animation: resultFadeIn 0.8s ease 0.2s forwards;
+  }
+
+  @keyframes resultFadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* 小屏适配 */
+  @media (max-width: 400px) {
+    .app-container {
+      padding: 24px 16px 32px;
+      border-radius: 24px;
+    }
+    .start-title {
+      font-size: 24px;
+    }
+    .result-role {
+      font-size: 34px;
+    }
+    .question-text {
+      font-size: 17px;
+    }
+    .option-btn {
+      font-size: 15px;
+      padding: 14px 16px;
+    }
+  }
 </style>
 </head>
 <body>
-<div class="card">
-  <div class="progress"><div class="progress-bar" id="bar"></div></div>
-  <div id="quiz">
-    <h1 id="title">测试</h1>
-    <div class="question" id="question"></div>
-    <div id="options"></div>
+
+<div class="app-container">
+
+  <!-- ===== 开始页 ===== -->
+  <div id="startScreen" class="state active">
+    <div class="start-title">测测你像<br>艺术是死里的谁</div>
+    <button class="start-btn" id="startBtn">开 始</button>
   </div>
-  <div id="result" class="hidden">
-    <h1>你的结果</h1>
-    <div class="result" id="resultText"></div>
-    <p id="resultDesc"></p>
-    <button class="option" onclick="location.reload()">重新测试</button>
+
+  <!-- ===== 答题页 ===== -->
+  <div id="quizScreen" class="state">
+    <div class="quiz-header">
+      <span id="progressText">第 1 题 / 共 15 题</span>
+      <span id="percentText">0%</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressFill"></div>
+    </div>
+    <div class="quiz-fade" id="quizContent">
+      <div class="question-text" id="questionText"></div>
+      <div class="options-list" id="optionsList"></div>
+    </div>
   </div>
+
+  <!-- ===== 结果页 ===== -->
+  <div id="resultScreen" class="state">
+    <div class="result-content">
+      <div class="result-label">你的测试结果</div>
+      <div class="result-role" id="resultRole"></div>
+      <div class="result-desc" id="resultDesc"></div>
+      <div class="percent-section" id="percentSection"></div>
+      <button class="retry-btn" id="retryBtn">再测一次</button>
+    </div>
+  </div>
+
 </div>
 
 <script>
-// ===== 题库：每题两个选项，分别对应不同维度加分 =====
+/* ============================================================
+   数据定义
+   ============================================================ */
+
+/**
+ * 题目数组
+ * 每道题包含：
+ *   text: 题目文本
+ *   options: 选项数组，每个选项有 text 和 scores
+ *   scores: 该选项给哪个角色加分
+ * 角色 key 映射：
+ *   spring  → 春城留声
+ *   winter  → 冬鸠
+ *   autumn  → 空庭安久乐
+ *   wind    → 风月院岚
+ */
 const questions = [
-  { q: "周末你更想：", a: { text: "和朋友出去聚会", type: "E" }, b: { text: "在家独处休息", type: "I" } },
-  { q: "做决定时你更依赖：", a: { text: "逻辑分析", type: "T" }, b: { text: "感受和价值观", type: "F" } },
-  { q: "你更喜欢的做事方式：", a: { text: "提前计划好", type: "J" }, b: { text: "随机应变", type: "P" } },
-  { q: "你更关注：", a: { text: "现实和细节", type: "S" }, b: { text: "可能性和未来", type: "N" } },
-  // 可以继续加题...
+  {
+    text: "当你在某个领域付出了很多努力，却始终被别人轻松超越时，你通常会：",
+    options: [
+      { text: "表面平静，心里却反复咀嚼这种落差，久久无法释怀。", scores: { spring: 1 } },
+      { text: "耸耸肩，觉得这个世界本来就充满了荒诞和不公平，笑一笑就过去了。", scores: { winter: 1 } },
+      { text: "把不甘心转化成行动，更拼命地钻研，直到找出突破的方法。", scores: { autumn: 1 } },
+      { text: "承认差距，但会思考如何用其他方式掌握主动权，而不是硬拼天赋。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "朋友向你倾诉痛苦时，你更习惯怎么回应？",
+    options: [
+      { text: "安静地听着，很少说安慰的话，但会默默帮对方做点什么。", scores: { spring: 1 } },
+      { text: "讲一个更惨的故事，用夸张的方式逗对方笑出来。", scores: { winter: 1 } },
+      { text: "直接问清楚来龙去脉，帮对方分析问题、找解决办法。", scores: { autumn: 1 } },
+      { text: "先安抚情绪，再不动声色地把话题引向对方愿意说出的信息。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "你更害怕哪种情况发生？",
+    options: [
+      { text: "被人当面否定你最在乎的能力。", scores: { spring: 1 } },
+      { text: "身边的人陷入悲伤，而你无法让他们笑出来。", scores: { winter: 1 } },
+      { text: "明明知道有问题，却因为证据不足而无法阻止。", scores: { autumn: 1 } },
+      { text: "自己精心维护的局面被一个意外彻底打乱。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "在一段亲密关系里，你更倾向于：",
+    options: [
+      { text: "保持距离，即使关心也不轻易表达，怕暴露自己的软弱。", scores: { spring: 1 } },
+      { text: "把对方拉进自己的世界，成为彼此唯一的搭档。", scores: { winter: 1 } },
+      { text: "用行动保护对方，哪怕对方暂时不理解你的做法。", scores: { autumn: 1 } },
+      { text: "为对方安排好一切，希望对方按照你设想的方向成长。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "你有一个不为人知的秘密，它更接近哪一种？",
+    options: [
+      { text: "你曾经做过一件无法挽回的事，至今仍在承受后果。", scores: { spring: 1 } },
+      { text: "你相信一些别人觉得疯狂的东西，并且已经在悄悄实践。", scores: { winter: 1 } },
+      { text: "你隐藏了真实身份，接近某个人是为了完成自己的目标。", scores: { autumn: 1 } },
+      { text: "你正在计划一件事，这件事会伤害一些人，但你认为值得。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "遇到棘手的冲突时，你更常用的方式是：",
+    options: [
+      { text: "忍耐，忍耐，直到忍无可忍，然后一次性爆发。", scores: { spring: 1 } },
+      { text: "用语言、氛围和情绪引导对方，让对方按你的节奏走。", scores: { winter: 1 } },
+      { text: "收集信息、寻找破绽，用证据和逻辑压倒对方。", scores: { autumn: 1 } },
+      { text: "衡量各方利益，用交易和妥协换取最大的掌控权。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "别人眼中的你，最可能是哪种形象？",
+    options: [
+      { text: "冷淡、话少、有点难以接近，但并非没有感情。", scores: { spring: 1 } },
+      { text: "热情、夸张、永远像在表演，让人看不透真实情绪。", scores: { winter: 1 } },
+      { text: "认真、固执、认准的事九头牛都拉不回来。", scores: { autumn: 1 } },
+      { text: "温和、得体、笑容背后却让人不敢轻易试探。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "你如何看待“结束”这件事？",
+    options: [
+      { text: "结束是一种解脱，也是一种早就该来的谢幕。", scores: { spring: 1 } },
+      { text: "结束不是终点，而是另一场演出的开幕。", scores: { winter: 1 } },
+      { text: "结束意味着正义得到伸张，或者自己为此付出代价。", scores: { autumn: 1 } },
+      { text: "结束只是计划的一环，重要的是结束后谁还在场上。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "你最珍视的东西更接近：",
+    options: [
+      { text: "一件旧物，或者一个你从未真正叫出口的名字。", scores: { spring: 1 } },
+      { text: "一个愿意站在你身边的人，和一场还没完成的表演。", scores: { winter: 1 } },
+      { text: "一个证明你存在价值的目标，和一路追到底的决心。", scores: { autumn: 1 } },
+      { text: "一个你亲手培养的人，和一份延续下去的事业。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "如果必须在两难中做选择，你更可能：",
+    options: [
+      { text: "牺牲自己，成全别人，反正你早就习惯了自我厌恶。", scores: { spring: 1 } },
+      { text: "牺牲观众，让他们以为一切只是意外。", scores: { winter: 1 } },
+      { text: "牺牲同伴，只要最终能达成你认为正确的结果。", scores: { autumn: 1 } },
+      { text: "牺牲盟友，只要核心的人和事不受影响。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "你的成长经历更接近哪一种？",
+    options: [
+      { text: "长期被忽视，活在别人的阴影里，很少被真正认可。", scores: { spring: 1 } },
+      { text: "在痛苦中学会用笑来应对，把悲伤变成表演的素材。", scores: { winter: 1 } },
+      { text: "靠自己的努力和技能一步步爬起来，不依赖任何人。", scores: { autumn: 1 } },
+      { text: "被选中、被培养，承担着某种期望，也承受着压力。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "你更容易对什么样的人产生复杂的情感？",
+    options: [
+      { text: "拥有你渴望却得不到的东西的人。", scores: { spring: 1 } },
+      { text: "愿意无条件站在你身边、成为你同伴的人。", scores: { winter: 1 } },
+      { text: "让你感到愧疚、又忍不住想保护的人。", scores: { autumn: 1 } },
+      { text: "你付出很多心血、却开始想要离开你的人。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "你希望自己最终以什么方式退场？",
+    options: [
+      { text: "在属于你的舞台上，用最决绝的方式完成最后一次表演。", scores: { spring: 1 } },
+      { text: "和你最信任的人一起，走向一个没有人打扰的地方。", scores: { winter: 1 } },
+      { text: "在追逐目标的路上，哪怕倒下也不后悔。", scores: { autumn: 1 } },
+      { text: "看着自己守护的东西延续下去，哪怕自己背负骂名。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "你更擅长以下哪件事？",
+    options: [
+      { text: "在众人面前表演，同时把真实情绪藏得滴水不漏。", scores: { spring: 1 } },
+      { text: "用幽默和魔术化解尴尬，让气氛跟着你走。", scores: { winter: 1 } },
+      { text: "快速学习新技术，并在关键时刻冷静出手。", scores: { autumn: 1 } },
+      { text: "察言观色，用最小的代价换取最大的话语权。", scores: { wind: 1 } }
+    ]
+  },
+  {
+    text: "如果要用一句话概括你的内心，你更愿意选：",
+    options: [
+      { text: "“我早就没有资格站在这里了。”", scores: { spring: 1 } },
+      { text: "“笑一笑吧，总有人比你更惨。”", scores: { winter: 1 } },
+      { text: "“对的事情，不管怎样都要做到底。”", scores: { autumn: 1 } },
+      { text: "“我做的一切，都是为了我在乎的人。”", scores: { wind: 1 } }
+    ]
+  }
 ];
 
-const scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
-let current = 0;
+/* 角色信息映射 */
+const roleInfo = {
+  spring: {
+    name: "春城留声",
+    desc: "你习惯把情绪压到最深处，不轻易让人看见。你曾经有过想站上的位置，却因为种种原因退了下来。你表面冷淡，内心却比谁都清楚自己的不甘、愧疚和执念。你可能会用沉默保护别人，也可能用沉默伤害自己。"
+  },
+  winter: {
+    name: "冬鸠",
+    desc: "你擅长用笑容和玩笑化解沉重。你经历过不少糟糕的事，于是学会把悲剧当成喜剧来讲。你相信笑声能掩盖很多东西，也相信荒诞本身就是一种真实。你渴望一个不会离开的搭档，也愿意把最疯狂的一面留给最信任的人。"
+  },
+  autumn: {
+    name: "空庭安久乐",
+    desc: "你认定一件事，就会一条路走到黑。你相信规则、证据和正确的事，也愿意为了这些付出代价。你不太擅长表达感情，关心别人的方式常常笨拙又固执。你可能会让人觉得不近人情，但你心里有一套极其坚定的标准。"
+  },
+  wind: {
+    name: "风月院岚",
+    desc: "你看起来温和、得体，实际上非常清楚自己要什么。你擅长布局，也愿意为了在乎的人或事做出常人难以接受的选择。你不相信虚无缥缈的东西，更相信自己的判断和手段。你的温柔是真的，你的危险也是真的。"
+  }
+};
 
-function render() {
-  if (current >= questions.length) return showResult();
-  const q = questions[current];
-  document.getElementById("question").textContent = q.q;
-  document.getElementById("bar").style.width = (current / questions.length * 100) + "%";
-  const box = document.getElementById("options");
-  box.innerHTML = "";
-  ["a", "b"].forEach(k => {
-    const btn = document.createElement("button");
-    btn.className = "option";
-    btn.textContent = q[k].text;
-    btn.onclick = () => {
-      scores[q[k].type]++;
-      current++;
-      render();
-    };
-    box.appendChild(btn);
+/* ============================================================
+   状态管理
+   ============================================================ */
+let currentQuestionIndex = 0;           // 当前题号（0 开始）
+const totalQuestions = questions.length; // 总题数
+let scores = { spring: 0, winter: 0, autumn: 0, wind: 0 }; // 各角色得分
+
+/* ============================================================
+   DOM 元素引用
+   ============================================================ */
+const startScreen = document.getElementById('startScreen');
+const quizScreen = document.getElementById('quizScreen');
+const resultScreen = document.getElementById('resultScreen');
+
+const startBtn = document.getElementById('startBtn');
+const progressText = document.getElementById('progressText');
+const percentText = document.getElementById('percentText');
+const progressFill = document.getElementById('progressFill');
+const questionText = document.getElementById('questionText');
+const optionsList = document.getElementById('optionsList');
+const quizContent = document.getElementById('quizContent');
+
+const resultRole = document.getElementById('resultRole');
+const resultDesc = document.getElementById('resultDesc');
+const percentSection = document.getElementById('percentSection');
+const retryBtn = document.getElementById('retryBtn');
+
+/* ============================================================
+   页面切换函数
+   ============================================================ */
+function switchState(fromEl, toEl) {
+  fromEl.classList.remove('active');
+  // 短暂延迟后显示新页面，保证动画流畅
+  setTimeout(() => {
+    toEl.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 200);
+}
+
+/* ============================================================
+   答题逻辑
+   ============================================================ */
+
+/** 渲染当前题目 */
+function renderQuestion() {
+  const q = questions[currentQuestionIndex];
+
+  // 更新进度显示
+  const currentNum = currentQuestionIndex + 1;
+  const progressPercent = Math.round((currentQuestionIndex / totalQuestions) * 100);
+  progressText.textContent = `第 ${currentNum} 题 / 共 ${totalQuestions} 题`;
+  percentText.textContent = `${progressPercent}%`;
+  progressFill.style.width = `${progressPercent}%`;
+
+  // 更新题目文本
+  questionText.textContent = q.text;
+
+  // 清空并生成选项
+  optionsList.innerHTML = '';
+  const prefixLetters = ['A', 'B', 'C', 'D'];
+
+  q.options.forEach((opt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="option-prefix">${prefixLetters[idx]}.</span>${opt.text}`;
+
+    // 点击选项事件
+    btn.addEventListener('click', () => handleOptionClick(opt.scores));
+
+    optionsList.appendChild(btn);
   });
 }
 
-function showResult() {
-  document.getElementById("quiz").classList.add("hidden");
-  document.getElementById("result").classList.remove("hidden");
-  document.getElementById("bar").style.width = "100%";
-  const type =
-    (scores.E >= scores.I ? "E" : "I") +
-    (scores.S >= scores.N ? "S" : "N") +
-    (scores.T >= scores.F ? "T" : "F") +
-    (scores.J >= scores.P ? "J" : "P");
-  document.getElementById("resultText").textContent = type;
-  const desc = {
-    "INTJ": "建筑师：有远见，喜欢独立思考。",
-    "ENFP": "竞选者：热情，富有想象力。",
-    // 其他类型可以自己补
-  };
-  document.getElementById("resultDesc").textContent = desc[type] || "这是你的类型：" + type;
+/** 处理选项点击 */
+function handleOptionClick(optionScores) {
+  // 1. 累加分数
+  for (const key in optionScores) {
+    if (scores.hasOwnProperty(key)) {
+      scores[key] += optionScores[key];
+    }
+  }
+
+  // 2. 播放切换动画后进入下一题或结果页
+  quizContent.classList.add('out');
+
+  setTimeout(() => {
+    quizContent.classList.remove('out');
+    currentQuestionIndex++;
+
+    if (currentQuestionIndex < totalQuestions) {
+      // 还有题目，继续答题
+      renderQuestion();
+    } else {
+      // 答完所有题目，显示结果
+      showResult();
+    }
+  }, 350);
 }
 
-render();
+/* ============================================================
+   结果计算与展示
+   ============================================================ */
+
+/** 计算最终结果并展示 */
+function showResult() {
+  // 1. 计算各角色百分比
+  const totalScore = Object.values(scores).reduce((a, b) => a + b, 0) || 1;
+  const percentages = {};
+  for (const key in scores) {
+    percentages[key] = Math.round((scores[key] / totalScore) * 100);
+  }
+
+  // 2. 找出最高分（处理并列情况）
+  const maxScore = Math.max(...Object.values(scores));
+  const topRoles = Object.keys(scores).filter(key => scores[key] === maxScore);
+
+  // 3. 生成结果角色名
+  let roleNameText = '';
+  if (topRoles.length === 1) {
+    // 无并列
+    roleNameText = roleInfo[topRoles[0]].name;
+  } else if (topRoles.length === 2) {
+    // 两项并列
+    roleNameText = `${roleInfo[topRoles[0]].name} 或 ${roleInfo[topRoles[1]].name}`;
+  } else if (topRoles.length === 3) {
+    // 三项并列
+    roleNameText = `${roleInfo[topRoles[0]].name} 或 ${roleInfo[topRoles[1]].name} 或 ${roleInfo[topRoles[2]].name}`;
+  } else {
+    // 四项全部并列（理论上极少出现）
+    roleNameText = `${roleInfo.spring.name} 或 ${roleInfo.winter.name} 或 ${roleInfo.autumn.name} 或 ${roleInfo.wind.name}`;
+  }
+
+  // 4. 生成描述（如果是并列，取第一个角色的描述）
+  const mainRole = topRoles[0];
+  const descText = roleInfo[mainRole].desc;
+
+  // 5. 更新结果页 DOM
+  resultRole.textContent = roleNameText;
+  resultDesc.textContent = descText;
+
+  // 6. 生成百分比条
+  percentSection.innerHTML = '';
+  // 按固定顺序展示，方便对比
+  const order = ['spring', 'winter', 'autumn', 'wind'];
+  order.forEach(key => {
+    const item = document.createElement('div');
+    item.className = 'percent-item';
+
+    const nameEl = document.createElement('div');
+    nameEl.className = 'percent-name';
+    nameEl.textContent = roleInfo[key].name;
+
+    const trackEl = document.createElement('div');
+    trackEl.className = 'percent-bar-track';
+
+    const fillEl = document.createElement('div');
+    fillEl.className = 'percent-bar-fill';
+    // 初始宽度 0，下一帧再设置目标宽度以触发过渡动画
+    fillEl.style.width = '0%';
+
+    const valueEl = document.createElement('div');
+    valueEl.className = 'percent-value';
+    valueEl.textContent = `${percentages[key]}%`;
+
+    trackEl.appendChild(fillEl);
+    item.appendChild(nameEl);
+    item.appendChild(trackEl);
+    item.appendChild(valueEl);
+    percentSection.appendChild(item);
+
+    // 延迟设置宽度，触发 CSS 过渡
+    setTimeout(() => {
+      fillEl.style.width = `${percentages[key]}%`;
+    }, 100);
+  });
+
+  // 7. 切换到结果页
+  switchState(quizScreen, resultScreen);
+}
+
+/* ============================================================
+   重置逻辑
+   ============================================================ */
+
+/** 重置所有状态，回到开始页 */
+function resetAll() {
+  currentQuestionIndex = 0;
+  scores = { spring: 0, winter: 0, autumn: 0, wind: 0 };
+
+  // 清空结果页展示内容
+  resultRole.textContent = '';
+  resultDesc.textContent = '';
+  percentSection.innerHTML = '';
+
+  // 进度条重置
+  progressFill.style.width = '0%';
+  percentText.textContent = '0%';
+
+  // 回到开始页
+  switchState(resultScreen, startScreen);
+}
+
+/* ============================================================
+   事件绑定与初始化
+   ============================================================ */
+
+// 开始按钮
+startBtn.addEventListener('click', () => {
+  // 重置状态后进入答题
+  currentQuestionIndex = 0;
+  scores = { spring: 0, winter: 0, autumn: 0, wind: 0 };
+
+  switchState(startScreen, quizScreen);
+
+  // 稍等动画完成后渲染第一题
+  setTimeout(() => {
+    renderQuestion();
+  }, 300);
+});
+
+// 再测一次按钮
+retryBtn.addEventListener('click', () => {
+  resetAll();
+});
+
+/* 初始化：确保开始页可见 */
+window.addEventListener('DOMContentLoaded', () => {
+  // 初始只显示开始页，隐藏其他
+  startScreen.classList.add('active');
+  quizScreen.classList.remove('active');
+  resultScreen.classList.remove('active');
+});
+
 </script>
 </body>
 </html>
