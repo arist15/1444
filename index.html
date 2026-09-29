@@ -80,15 +80,6 @@
     opacity: 0;
   }
 
-  .start-note {
-    font-size: 13px;
-    color: #B8A898;
-    letter-spacing: 1px;
-    margin-bottom: 36px;
-    animation: fadeInUp 1.8s ease 0.5s forwards;
-    opacity: 0;
-  }
-
   @keyframes fadeInUp {
     from {
       opacity: 0;
@@ -236,12 +227,6 @@
     background-clip: text;
   }
 
-  .result-role.tie {
-    font-size: 26px;
-    line-height: 1.6;
-    letter-spacing: 2px;
-  }
-
   .result-desc {
     font-size: 15px;
     line-height: 1.9;
@@ -347,9 +332,6 @@
     .result-role {
       font-size: 34px;
     }
-    .result-role.tie {
-      font-size: 22px;
-    }
     .question-text {
       font-size: 17px;
     }
@@ -368,7 +350,6 @@
   <div id="startScreen" class="state active">
     <div class="start-title">测测你像<br>艺术是死里的谁</div>
     <div class="start-author">@目非</div>
-    <div class="start-note">仅供娱乐，请勿当真</div>
     <button class="start-btn" id="startBtn">开 始</button>
   </div>
 
@@ -688,34 +669,16 @@ function showResult() {
   const maxScore = Math.max(...Object.values(scores));
   const topRoles = Object.keys(scores).filter(key => scores[key] === maxScore);
 
-  // 3. 生成结果角色名
-  let roleNameText = '';
-  let isTie = false;
+  // 3. 随机选择一项显示（并列时）
+  const randomIndex = Math.floor(Math.random() * topRoles.length);
+  const selectedRole = topRoles[randomIndex];
 
-  if (topRoles.length === 1) {
-    roleNameText = roleInfo[topRoles[0]].name;
-  } else if (topRoles.length === 2) {
-    isTie = true;
-    roleNameText = `你像${roleInfo[topRoles[0]].name}<br>或<br>${roleInfo[topRoles[1]].name}`;
-  } else if (topRoles.length === 3) {
-    isTie = true;
-    roleNameText = `你像${roleInfo[topRoles[0]].name}<br>或<br>${roleInfo[topRoles[1]].name}<br>或<br>${roleInfo[topRoles[2]].name}`;
-  } else {
-    isTie = true;
-    roleNameText = `你像${roleInfo.spring.name}<br>或<br>${roleInfo.winter.name}<br>或<br>${roleInfo.autumn.name}<br>或<br>${roleInfo.wind.name}`;
-  }
-
-  // 4. 生成描述（如果是并列，取第一个角色的描述）
-  const mainRole = topRoles[0];
-  const descText = roleInfo[mainRole].desc;
+  // 4. 获取角色名称和描述
+  const roleNameText = roleInfo[selectedRole].name;
+  const descText = roleInfo[selectedRole].desc;
 
   // 5. 更新结果页 DOM
-  if (isTie) {
-    resultRole.classList.add('tie');
-  } else {
-    resultRole.classList.remove('tie');
-  }
-  resultRole.innerHTML = roleNameText; // 使用 innerHTML 以支持换行
+  resultRole.textContent = roleNameText;
   resultDesc.textContent = descText;
 
   // 6. 生成百分比条
@@ -746,6 +709,7 @@ function showResult() {
     item.appendChild(valueEl);
     percentSection.appendChild(item);
 
+    // 延迟设置宽度，触发过渡动画
     setTimeout(() => {
       fillEl.style.width = `${percentages[key]}%`;
     }, 100);
@@ -765,7 +729,6 @@ function resetAll() {
   scores = { spring: 0, winter: 0, autumn: 0, wind: 0 };
 
   resultRole.textContent = '';
-  resultRole.classList.remove('tie');
   resultDesc.textContent = '';
   percentSection.innerHTML = '';
 
