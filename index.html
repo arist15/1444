@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的测试</title>
+<style>
+  body { font-family: -apple-system, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5; }
+  .card { background: #fff; border-radius: 16px; padding: 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+  h1 { font-size: 22px; text-align: center; }
+  .question { font-size: 18px; margin: 20px 0; }
+  .option { display: block; width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #e0e0e0; border-radius: 10px; background: #fff; font-size: 16px; text-align: left; }
+  .option:active { background: #eef; border-color: #66f; }
+  .result { font-size: 24px; font-weight: bold; text-align: center; color: #3366ff; }
+  .progress { height: 6px; background: #e0e0e0; border-radius: 3px; overflow: hidden; margin-bottom: 20px; }
+  .progress-bar { height: 100%; background: #3366ff; width: 0; transition: width 0.3s; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="progress"><div class="progress-bar" id="bar"></div></div>
+  <div id="quiz">
+    <h1 id="title">测试</h1>
+    <div class="question" id="question"></div>
+    <div id="options"></div>
+  </div>
+  <div id="result" class="hidden">
+    <h1>你的结果</h1>
+    <div class="result" id="resultText"></div>
+    <p id="resultDesc"></p>
+    <button class="option" onclick="location.reload()">重新测试</button>
+  </div>
+</div>
+
+<script>
+// ===== 题库：每题两个选项，分别对应不同维度加分 =====
+const questions = [
+  { q: "周末你更想：", a: { text: "和朋友出去聚会", type: "E" }, b: { text: "在家独处休息", type: "I" } },
+  { q: "做决定时你更依赖：", a: { text: "逻辑分析", type: "T" }, b: { text: "感受和价值观", type: "F" } },
+  { q: "你更喜欢的做事方式：", a: { text: "提前计划好", type: "J" }, b: { text: "随机应变", type: "P" } },
+  { q: "你更关注：", a: { text: "现实和细节", type: "S" }, b: { text: "可能性和未来", type: "N" } },
+  // 可以继续加题...
+];
+
+const scores = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0 };
+let current = 0;
+
+function render() {
+  if (current >= questions.length) return showResult();
+  const q = questions[current];
+  document.getElementById("question").textContent = q.q;
+  document.getElementById("bar").style.width = (current / questions.length * 100) + "%";
+  const box = document.getElementById("options");
+  box.innerHTML = "";
+  ["a", "b"].forEach(k => {
+    const btn = document.createElement("button");
+    btn.className = "option";
+    btn.textContent = q[k].text;
+    btn.onclick = () => {
+      scores[q[k].type]++;
+      current++;
+      render();
+    };
+    box.appendChild(btn);
+  });
+}
+
+function showResult() {
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("result").classList.remove("hidden");
+  document.getElementById("bar").style.width = "100%";
+  const type =
+    (scores.E >= scores.I ? "E" : "I") +
+    (scores.S >= scores.N ? "S" : "N") +
+    (scores.T >= scores.F ? "T" : "F") +
+    (scores.J >= scores.P ? "J" : "P");
+  document.getElementById("resultText").textContent = type;
+  const desc = {
+    "INTJ": "建筑师：有远见，喜欢独立思考。",
+    "ENFP": "竞选者：热情，富有想象力。",
+    // 其他类型可以自己补
+  };
+  document.getElementById("resultDesc").textContent = desc[type] || "这是你的类型：" + type;
+}
+
+render();
+</script>
+</body>
+</html>
